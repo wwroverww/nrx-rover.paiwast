@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ērest grocery - نرخی ڕاستەوخۆی هەولێر</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(180deg, #180205, #021408, #180205);
+  background-size: 100% 400%;
+  animation: heartBeatWave 8s ease-in-out infinite;
+  color: white;
+  overflow-x: hidden;
+}
+@keyframes heartBeatWave {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 0% 100%; }
+  100% { background-position: 0% 0%; }
+}
+.container { width: min(1500px, 94%); margin: auto; padding: 35px 0 50px; }
+.header { text-align: center; margin-bottom: 30px; }
+.logo {
+  font-size: clamp(30px, 5vw, 58px);
+  font-weight: 900;
+  background: linear-gradient(90deg, #ff4d4d, #b30000, #ff6666);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 35px rgba(255, 0, 0, 0.3);
+}
+.subtitle { margin-top: 8px; font-size: 16px; color: rgba(255,255,255,.65); }
+.status {
+  margin-top: 12px; display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 14px; border-radius: 50px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+  color: rgba(255,255,255,.7); font-size: 13px;
+}
+.statusDot { width: 8px; height: 8px; border-radius: 50%; background: #35e89a; box-shadow: 0 0 12px #35e89a; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.card {
+  position: relative; overflow: hidden; min-height: 245px; padding: 25px; border-radius: 28px;
+  background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  border: 1px solid rgba(255,255,255,.1);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 20px 60px rgba(0,0,0,.4);
+  backdrop-filter: blur(25px);
+  transition: transform .25s ease;
+}
+.card:hover { transform: translateY(-3px); }
+.cardTop { display: flex; align-items: center; justify-content: space-between; direction: ltr; }
+.left { display: flex; align-items: center; gap: 12px; }
+.icon { width: 54px; height: 54px; display: grid; place-items: center; border-radius: 17px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1); font-size: 28px; }
+.name { direction: rtl; text-align: right; font-size: 20px; font-weight: 800; }
+.unit { margin-top: 4px; color: rgba(255,255,255,.5); font-size: 12px; }
+.valueBox { margin-top: 25px; }
+.value { direction: ltr; text-align: right; font-size: clamp(32px, 4vw, 52px); font-weight: 900; letter-spacing: -1px; color: white; }
+.previous { margin-top: 8px; min-height: 20px; font-size: 13px; color: rgba(255,255,255,.5); opacity: 0; transition: opacity .2s ease; }
+.previous.show { opacity: 1; }
+.chart { height: 50px; margin-top: 12px; opacity: .7; }
+.chart svg { width: 100%; height: 100%; }
+.wave { fill: none; stroke: rgba(100,205,255,.7); stroke-width: 2; stroke-linecap: round; }
+.footer { margin-top: 25px; text-align: center; color: rgba(255,255,255,.4); font-size: 12px; }
+@media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="logo">ērest grocery</div>
+    <div class="subtitle">نرخی ڕاستەوخۆی بازاڕی هەولێر</div>
+    <div class="status">
+      <span class="statusDot"></span>
+      <span id="statusText">چاوەڕێی پەیوەندی بە بۆرسە...</span>
+    </div>
+  </header>
+
+  <main class="grid">
+    <div class="card">
+      <div class="cardTop"><div class="left"><div class="icon">🇺🇸</div><div><div class="name">دۆلار</div><div class="unit">100 USD</div></div></div></div>
+      <div class="valueBox"><div class="value" id="usd">—</div><div class="previous" id="usdPrev"></div></div>
+      <div class="chart"><svg viewBox="0 0 500 60" preserveAspectRatio="none"><path class="wave" d="M0 40 L500 25"></path></svg></div>
+    </div>
+    <div class="card">
+      <div class="cardTop"><div class="left"><div class="icon">🇪🇺</div><div><div class="name">یۆرۆ</div><div class="unit">100 EUR</div></div></div></div>
+      <div class="valueBox"><div class="value" id="eur">—</div><div class="previous" id="eurPrev"></div></div>
+      <div class="chart"><svg viewBox="0 0 500 60" preserveAspectRatio="none"><path class="wave" d="M0 40 L500 28"></path></svg></div>
+    </div>
+    <div class="card">
+      <div class="cardTop"><div class="left"><div class="icon">🇬🇧</div><div><div class="name">پاوەند</div><div class="unit">100 GBP</div></div></div></div>
+      <div class="valueBox"><div class="value" id="gbp">—</div><div class="previous" id="gbpPrev"></div></div>
+      <div class="chart"><svg viewBox="0 0 500 60" preserveAspectRatio="none"><path class="wave" d="M0 35 L500 20"></path></svg></div>
+    </div>
+    <div class="card">
+      <div class="cardTop"><div class="left"><div class="icon">🇮🇷</div><div><div class="name">تومەنی ئێران</div><div class="unit">بەرامبەر 100 دۆلار</div></div></div></div>
+      <div class="valueBox"><div class="value" id="toman">—</div><div class="previous" id="tomanPrev"></div></div>
+      <div class="chart"><svg viewBox="0 0 500 60" preserveAspectRatio="none"><path class="wave" d="M0 42 L500 20"></path></svg></div>
+    </div>
+    <div class="card">
+      <div class="cardTop"><div class="left"><div class="icon">🥇</div><div><div class="name">زێڕی ٢١ عیار</div><div class="unit">١ مثقال</div></div></div></div>
+      <div class="valueBox"><div class="value" id="gold">—</div><div class="previous" id="goldPrev"></div></div>
+      <div class="chart"><svg viewBox="0 0 500 60" preserveAspectRatio="none"><path class="wave" d="M0 38 L500 18"></path></svg></div>
+    </div>
+  </main>
+
+  <div class="footer">
+    دروست کراوی سیستەم rover — سەرچاوەی فەرمی بازاڕی هەولێر <br>
+    <span id="updated">—</span>
+  </div>
+</div>
+
+<script>
+// لینکی وۆرکەرەکەت لێرە دانراوە بۆ ئەوەی ڕاستەوخۆ نرخەکان بهێنێت
+const API = "https://lucky-sound-1655.roverm146.workers.dev";
+
+let state = { usd: null, eur: null, gbp: null, toman: null, gold: null };
+
+function formatIQD(val) {
+  if (!val || !Number.isFinite(Number(val))) return "—";
+  return Math.round(Number(val)).toLocaleString("en-US") + " IQD";
+}
+
+function formatToman(val) {
+  if (!val || !Number.isFinite(Number(val))) return "—";
+  return Math.round(Number(val)).toLocaleString("en-US") + " تومان";
+}
+
+function updateCard(key, value, formatter) {
+  const el = document.getElementById(key);
+  const prevEl = document.getElementById(key + "Prev");
+  if (!el) return;
+
+  if (value === null || value === undefined || !Number.isFinite(Number(value))) {
+    el.textContent = "—";
+    return;
+  }
+
+  const num = Number(value);
+  if (state[key] !== null && state[key] !== num) {
+    prevEl.textContent = "نرخی پێشوو: " + formatter(state[key]);
+    prevEl.classList.add("show");
+    setTimeout(() => prevEl.classList.remove("show"), 3000);
+  }
+
+  state[key] = num;
+  el.textContent = formatter(num);
+}
+
+async function fetchLiveRates() {
+  const statusText = document.getElementById("statusText");
+  try {
+    statusText.textContent = "نوێکردنەوەی نرخەکان...";
+    
+    const res = await fetch(API + "?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("Network error");
+    
+    const data = await res.json();
+    if (!data.success) throw new Error("Data unavailable");
+
+    updateCard("usd", data.usd?.value, formatIQD);
+    updateCard("eur", data.eur?.value, formatIQD);
+    updateCard("gbp", data.gbp?.value, formatIQD);
+    updateCard("toman", data.toman?.value, formatToman);
+    updateCard("gold", data.gold21?.value, formatIQD);
+
+    statusText.textContent = "نرخەکان ڕاستەوخۆ نوێکرانەوە";
+    document.getElementById("updated").textContent = "کاتی نوێکردنەوە: " + new Date().toLocaleTimeString("ku-IQ");
+
+  } catch (err) {
+    console.error(err);
+    statusText.textContent = "چاوەڕێی پەیوەندی بە سەرچاوە...";
+  }
+}
+
+fetchLiveRates();
+setInterval(fetchLiveRates, 30000);
+</script>
+</body>
+</html>
